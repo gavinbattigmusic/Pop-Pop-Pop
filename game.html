@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        @font-face {
+            font-family: 'CalmFont';
+            src: url('calmfont.ttf') format('truetype');
+            /* You can add additional font formats here for better browser compatibility */
+        }
+        
+        @font-face {
+            font-family: 'CalmFont2';
+            src: url('calmfont2.ttf') format('truetype');
+            /* You can add additional font formats here for better browser compatibility */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            cursor: none; /* Hide default cursor */
+        }
+
+        .button, .main-menu {
+            cursor: none !important;
+        }
+        body {
+            background: url('Background.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+        #main-screen, #playing-screen, #options-screen {
+            width: 100%;
+            height: 100%;
+            position: relative; /* Required for absolute positioning of cursor */
+        }
+        #main-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        #playing-screen, #options-screen {
+            display: none;
+            background-color: white;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-end;
+        }
+        h1 {
+            font-family: 'CalmFont', sans-serif;
+            color: #D2B48C; /* Light brown color */
+            font-size: 6em; /* Increased by a factor of 2 */
+            margin-top: 5%;
+        }
+        .button {
+            width: 400px; /* Increased by a factor of 2 */
+            height: 120px; /* Increased by a factor of 2 */
+            background-size: cover;
+            font-family: 'CalmFont', sans-serif;
+            font-size: 3em; /* Increased by a factor of 2 */
+            border: none;
+            cursor: pointer;
+            margin-top: 20px; /* Add some space between buttons */
+            color: #84c084; /* Default color */
+        }
+        .play-button {
+            background-image: url('PlayRect.png');
+        }
+        .options-button {
+            background-image: url('OptionsRect.png');
+        }
+        .quit-button {
+            background-image: url('QuitRect.png');
+        }
+        .button:hover {
+            color: white; /* Change text color on hover */
+        }
+        .main-menu {
+            font-family: 'CalmFont', sans-serif;
+            font-size: 2em;
+            color: #000000; /* Black color */
+            margin: 20px;
+            cursor: pointer;
+            position: relative; /* Required for positioning */
+        }
+        .main-menu:hover {
+            color: #00ff00; /* Change text color to green on hover */
+        }
+        #custom-cursor {
+            position: absolute;
+            width: 32px; /* Adjust size as needed */
+            height: 32px; /* Adjust size as needed */
+            background-image: url('cursor.png');
+            background-size: cover;
+            pointer-events: none; /* Make sure cursor doesn't interfere with clicks */
+        }
+        #playing-screen {
+            background-color: lightgray; /* Change background color to light gray */
+        }
+        #version-text {
+            position: absolute;
+            bottom: 15px;
+            left: 25px;
+            font-family: 'CalmFont2', sans-serif;
+            font-size: 2em;
+        }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid black; /* Add black outline */
+        }
+        #counter {
+            position: absolute;
+            font-family: 'CalmFont2', sans-serif;
+            font-size: 2em;
+            color: black;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div id="main-screen">
+        <h1>Pop Pop Pop!</h1>
+        <button class="button play-button" onclick="showPlayingScreen()">Play</button>
+        <button class="button options-button" onclick="showOptionsScreen()">Options</button>
+        <button class="button quit-button" onclick="stopMusic()">Quit</button>
+        <div id="version-text">version 0.3</div>
+    </div>
+    <div id="playing-screen">
+        <div class="main-menu" onclick="showMainScreen()">Main Menu</div>
+        <div id="counter">Bubbles Popped: 0</div>
+    </div>
+    <div id="options-screen">
+        <div class="main-menu" onclick="showMainScreen()">Main Menu</div>
+    </div>
+    <audio id="music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="pop-sound">
+        <source src="pop.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div id="custom-cursor"></div>
+
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+        const music = document.getElementById('music');
+        const popSound = document.getElementById('pop-sound');
+        let bubblesPopped = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.pageX + 'px';
+            cursor.style.top = e.pageY + 'px';
+        });
+
+        function showPlayingScreen() {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('playing-screen').style.display = 'flex';
+            music.play();
+            createCircles();
+        }
+
+        function showOptionsScreen() {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('options-screen').style.display = 'flex';
+            music.play();
+        }
+
+        function showMainScreen() {
+            document.getElementById('playing-screen').style.display = 'none';
+            document.getElementById('options-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'flex';
+            music.play();
+        }
+
+        function stopMusic() {
+            music.pause();
+        }
+
+        function createCircles() {
+            setInterval(() => {
+                const circle = document.createElement('div');
+                circle.classList.add('circle');
+                const radius = 20; // New radius size
+                circle.style.width = radius * 2 + 'px';
+                circle.style.height = radius * 2 + 'px';
+                circle.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16); // Random color
+                circle.style.left = Math.random() * (window.innerWidth - radius * 2) + 'px'; // Adjust left position
+                circle.style.top = Math.random() * (window.innerHeight - radius * 2) + 'px'; // Adjust top position
+                circle.addEventListener('click', function() {
+                    popSound.play();
+                    this.remove();
+                    bubblesPopped++;
+                    document.getElementById('counter').innerText = "Bubbles Popped: " + bubblesPopped;
+                });
+                document.getElementById('playing-screen').appendChild(circle);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
